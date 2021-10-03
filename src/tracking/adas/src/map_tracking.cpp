@@ -1,0 +1,24 @@
+#include "adas_control.h"
+#include "plan.h"
+
+int main(int argc, char **argv)
+{
+    ros::init(argc, argv, "map_tracking");
+    ros::NodeHandle nh;
+    ros::Rate loop_rate(FRE);
+
+    control_space::Controller control_(nh);
+    adas_plan map_(nh);    
+    map_.GetRouteFromFile();
+    
+    while(ros::ok)
+    {
+        control_.adas_tracking(map_.car_, map_.route_data_);
+
+        // control_.Visualization(map_.car_, map_.route_data_[control_.nearest_point_index_]);
+
+        ros::spinOnce();
+        loop_rate.sleep();
+    }
+
+}
