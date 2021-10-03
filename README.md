@@ -15,7 +15,7 @@ roslaunch adas_control map_generator.launch
 /map/height: 16.125
 ~~~
 
-## 2. 开通底层的likecan 与 组合导航Can通讯
+## 2. 开通底层的likecan 与 组合导航can通讯
 ~~~bash
 roslaunch likecan navigation.launch 
 ~~~
