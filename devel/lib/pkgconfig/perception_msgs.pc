@@ -1,0 +1,8 @@
+prefix=/home/sjtuzq/flm_ws/devel
+
+Name: perception_msgs
+Description: Description of perception_msgs
+Version: 1.0.0
+Cflags: -I/home/sjtuzq/flm_ws/devel/include
+Libs: -L${prefix}/lib 
+Requires: message_runtime

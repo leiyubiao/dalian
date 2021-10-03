@@ -5,7 +5,7 @@ int main(int argc, char **argv)
 {
     ros::init(argc, argv, "map_tracking");
     ros::NodeHandle nh;
-    ros::Rate loop_rate(FRE);
+    ros::Rate loop_rate(50);
 
     control_space::Controller control_(nh);
     adas_plan map_(nh);    
@@ -16,9 +16,13 @@ int main(int argc, char **argv)
         control_.adas_tracking(map_.car_, map_.route_data_);
 
         // control_.Visualization(map_.car_, map_.route_data_[control_.nearest_point_index_]);
-
-        ros::spinOnce();
         loop_rate.sleep();
+        ros::spinOnce();
+ 
     }
+
+    for (int i = 0; i < 100; ++i)
+        ROS_WARN("END!!!");
+    return 0;
 
 }

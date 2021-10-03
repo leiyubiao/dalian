@@ -1,0 +1,8 @@
+prefix=/home/sjtuzq/flm_ws/devel
+
+Name: likecan
+Description: Description of likecan
+Version: 0.0.0
+Cflags: -I/home/sjtuzq/flm_ws/src/control/likecan/include
+Libs: -L${prefix}/lib 
+Requires: std_msgs location_msgs perception_msgs control_msgs

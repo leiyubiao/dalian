@@ -1,0 +1,2 @@
+control/PID_controller:control/likecan:launch:tracking/adas:tracking/messages/control_msgs:tracking/messages/location_msgs:tracking/messages/perception_msgs
+-DCATKIN_DEVEL_PREFIX=/home/sjtuzq/flm_ws/devel -DCMAKE_INSTALL_PREFIX=/home/sjtuzq/flm_ws/install -G Unix Makefiles

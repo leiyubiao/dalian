@@ -33,7 +33,7 @@ class Example : public ToSolveBase{
 
 double Example::function(double t, double y, double k1, double k2, double k3) {
     double ans;
-    ans = k1 + k2 + k3 * y;
+    ans = k1 + k2 - k3 * y;
     return ans;
 }
 

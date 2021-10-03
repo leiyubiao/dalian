@@ -38,7 +38,7 @@ MIN_ACCEL: -6.5
 /control/vehicle_param/L1: 0.7
 /control/vehicle_param/L2: 0.85
 /control/vehicle_param/ts: 0.02
-/control/vehicle_param/steer_max_degree: 44
+/control/vehicle_param/steer_max_degree: 40
 
 # 最大速度和最小速度
 /control/max_speed: 1.0

@@ -457,8 +457,8 @@ namespace control_space
         vn_xy_pos.heading = route_data_[nearest_point_index_].heading;
         vn_xy_pos.velocity = route_data_[nearest_point_index_].velocity;
 
-        printf("nearest_point : %d\n", nearest_point_index_);
-        printf("nearest_point_velocity: %lf\n", route_data_[nearest_point_index_].velocity);
+        // printf("nearest_point : %d\n", nearest_point_index_);
+        // printf("nearest_point_velocity: %lf\n", route_data_[nearest_point_index_].velocity);
         
         // 根据最近点找到轨迹上的点
         // int over_look_index = nearest_point_index_ + 20;
@@ -478,12 +478,12 @@ namespace control_space
         xy_pos.heading = M_PI / 2.0 - xy_pos.heading / 180.0 * M_PI;
         // double lateralErr = vn_xy_pos.y * cos(vn_xy_pos.heading) - vn_xy_pos.x * sin(vn_xy_pos.heading);
         double lateralErr = (xy_pos.y - vn_xy_pos.y) * cos(vn_xy_pos.heading) - (xy_pos.x - vn_xy_pos.x) * sin(vn_xy_pos.heading);
-        printf("xy_pos_x = %lf, vn_xy_pos_x = %lf\n", xy_pos.x, vn_xy_pos.x);
-        printf("xy_pos_y = %lf, vn_xy_pos_y = %lf\n", xy_pos.y, vn_xy_pos.y);
-        printf("xy_pos_heading = %lf, vn_xy_pos_heading = %lf\n", xy_pos.heading, vn_xy_pos.heading);
+        // printf("xy_pos_x = %lf, vn_xy_pos_x = %lf\n", xy_pos.x, vn_xy_pos.x);
+        // printf("xy_pos_y = %lf, vn_xy_pos_y = %lf\n", xy_pos.y, vn_xy_pos.y);
+        // printf("xy_pos_heading = %lf, vn_xy_pos_heading = %lf\n", xy_pos.heading, vn_xy_pos.heading);
 
-        printf("headingErr: %lf\n", headingErr);
-        printf("lateralErr: %lf\n", lateralErr);
+        // printf("headingErr: %lf\n", headingErr);
+        // printf("lateralErr: %lf\n", lateralErr);
 
         // 根据调试看是否需要给headingErr限幅
         while(headingErr > M_PI)
@@ -497,7 +497,7 @@ namespace control_space
 
         double articulated_angle;
         double v = xy_pos.velocity;
-        printf("v:::%lf\n", v);
+        // printf("v:::%lf\n", v);
         double ref_curvature = 1 / (radius);
 
         // 铰接车运动学模型
@@ -521,9 +521,9 @@ namespace control_space
         double t2 = - k2_ * (L1_+L2_) * headingErr / L2_;
         double t3 = - v / L2_;
 
-        printf("t1: %lf\n", t1);
-        printf("t2: %lf\n", t2);
-        printf("t3: %lf\n", t3);
+        // printf("t1: %lf\n", t1);
+        // printf("t2: %lf\n", t2);
+        // printf("t3: %lf\n", t3);
 
         shared_ptr<ToSolveBase> toSolvePrt = make_shared<Example>();
         shared_ptr<OdmSolve> odmSolverPtr = make_shared<OdmSolve>(toSolvePrt);
@@ -535,10 +535,10 @@ namespace control_space
         articulated_angle = articulated_angle * 180.0 / M_PI;
         printf("car_angle_: %lf\n", car_angle_);
         double target_steering_angle = data_space::Clamp(articulated_angle, -steer_max_degree, steer_max_degree);
-        printf("articulated_angular %3lf\n", target_steering_angle);
+        printf("Angle: articulated_angular %3lf\n", target_steering_angle);
         
 
-        // 最后输出量为速度和转角
+        // 最后输出量为速度和转角,角度。暂时是左负右正，后续改成左正右.
         control_msgs::control_req control_cmd;
         control_cmd.Angle_req = target_steering_angle;
         control_cmd.Vel_req = vn_xy_pos.velocity;
@@ -574,39 +574,39 @@ namespace control_space
 
 }
 
-    double OdmSolve::GetAns(const vector<double>& tspace, double initNum, const double h, double k1, double k2, double k3) const 
-    {
-        int size = tspace.size();
-        assert(size==2);
-        double startTime = tspace[0];
-        double endTime = tspace[1];
-        assert(endTime > startTime);
-        int loopTime = (endTime - startTime) / h; // 循环100次
-        vector<double> k(4, 0.0);
-        vector<double> y(loopTime + 1);
+double OdmSolve::GetAns(const vector<double>& tspace, double initNum, const double h, double k1, double k2, double k3) const 
+{
+    int size = tspace.size();
+    assert(size==2);
+    double startTime = tspace[0];
+    double endTime = tspace[1];
+    assert(endTime > startTime);
+    int loopTime = (endTime - startTime) / h; // 循环100次
+    vector<double> k(4, 0.0);
+    vector<double> y(loopTime + 1);
 
-        // y[0] = *initNum.begin();
-        y[0] = initNum;
+    // y[0] = *initNum.begin();
+    y[0] = initNum;
 
-        for (int i = 0; i < loopTime; ++i) {
-            double t = startTime +  static_cast<double>(i * h);
-            k[0] = ToSolveBasePtr_->function(t, y[i], k1, k2, k3);
-            k[1] = ToSolveBasePtr_->function(t + h / 2.0, y[i] + h / 2.0 * k[0], k1, k2, k3);
-            k[2] = ToSolveBasePtr_->function(t + h / 2.0, y[i] + h / 2.0 * k[1], k1, k2, k3);
-            k[3] = ToSolveBasePtr_->function(t + h, y[i] + h * k[2], k1, k2, k3);
-            y[i + 1] = y[i] + h / 6.0 * (k[0] + 2 * k[1] + 2 * k[2] + k[3]);
-            // cout<<"i = "<<i<<" y = "<<y[i]<<endl;
-        }
-        // cout << "y[1] = " << y[1] << endl;
-        // cout << "y[9] = " << y[9] << endl;
-        // cout << "y[19] = " << y[9] << endl;
-        // cout << "y[29] = " << y[1] << endl;
-        // cout << "y[39] = " << y[9] << endl;
-        // cout << "y[49] = " << y[9] << endl;
-        // cout << "y[59] = " << y[1] << endl;
-        // cout << "y[69] = " << y[9] << endl;
-        // cout << "y[79] = " << y[9] << endl;
-        // cout << "y[89] = " << y[9] << endl;
-        // cout << "y[99] = " << y[9] << endl;
-        return y[99];
+    for (int i = 0; i < loopTime; ++i) {
+        double t = startTime +  static_cast<double>(i * h);
+        k[0] = ToSolveBasePtr_->function(t, y[i], k1, k2, k3);
+        k[1] = ToSolveBasePtr_->function(t + h / 2.0, y[i] + h / 2.0 * k[0], k1, k2, k3);
+        k[2] = ToSolveBasePtr_->function(t + h / 2.0, y[i] + h / 2.0 * k[1], k1, k2, k3);
+        k[3] = ToSolveBasePtr_->function(t + h, y[i] + h * k[2], k1, k2, k3);
+        y[i + 1] = y[i] + h / 6.0 * (k[0] + 2 * k[1] + 2 * k[2] + k[3]);
+        // cout<<"i = "<<i<<" y = "<<y[i]<<endl;
     }
+    // cout << "y[1] = " << y[1] << endl;
+    // cout << "y[9] = " << y[9] << endl;
+    // cout << "y[19] = " << y[9] << endl;
+    // cout << "y[29] = " << y[1] << endl;
+    // cout << "y[39] = " << y[9] << endl;
+    // cout << "y[49] = " << y[9] << endl;
+    // cout << "y[59] = " << y[1] << endl;
+    // cout << "y[69] = " << y[9] << endl;
+    // cout << "y[79] = " << y[9] << endl;
+    // cout << "y[89] = " << y[9] << endl;
+    // cout << "y[99] = " << y[9] << endl;
+    return y[50];
+}
