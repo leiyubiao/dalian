@@ -21,8 +21,4 @@ int main(int argc, char **argv)
  
     }
 
-    for (int i = 0; i < 100; ++i)
-        ROS_WARN("END!!!");
-    return 0;
-
 }
