@@ -5,7 +5,7 @@ int main(int argc, char **argv)
 {
     ros::init(argc, argv, "map_tracking");
     ros::NodeHandle nh;
-    ros::Rate loop_rate(FRE);
+    ros::Rate loop_rate(50);
 
     control_space::Controller control_(nh);
     adas_plan map_(nh);    
